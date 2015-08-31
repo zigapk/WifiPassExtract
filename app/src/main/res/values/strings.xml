@@ -8,4 +8,6 @@
 	<string name="banner_ad_unit_id">ca-app-pub-5159809184309788/2207286954</string>
     <string name="coffee">Give developer a coffee</string>
     <string name="give_a_coffee">Buy developer a coffe and get rid of ads</string>
+    <string name="terms">This program comes with absolutely no warranty. I take no responisibility for trubles, caused by this application. By using this app, you agree to this terms.</string>
+    <string name="terms_title">Terms and Conditions</string>
 </resources>

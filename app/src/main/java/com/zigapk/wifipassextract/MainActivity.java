@@ -33,9 +33,9 @@ public class MainActivity extends Activity {
 
         startRefresh();
 
-        if (Data.isFirstTime(getApplicationContext())) {
-            showFirstTimeDialog();
-        }
+        if (Data.isFirstTime(getApplicationContext()))
+            showTermsDialog();
+
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -80,12 +80,10 @@ public class MainActivity extends Activity {
 
         Files.writeToFile("wpa_supplicant.conf", "", getApplicationContext());
         try {
-            RootAccess.exec("cp /data/misc/wifi/wpa_supplicant.conf /data/data/com.zigapk.wifipassextract/files/");
-
             Thread.sleep(10);
-
+            RootAccess.exec("cp /data/misc/wifi/wpa_supplicant.conf /data/data/com.zigapk.wifipassextract/files/");
+            Thread.sleep(10);
             String fileContent = Files.getFileValue("wpa_supplicant.conf", getApplicationContext());
-
             Thread.sleep(10);
 
             final Network[] networks = Network.fromFile(fileContent);
@@ -144,6 +142,19 @@ public class MainActivity extends Activity {
     }
 
     private void showFirstTimeDialog() {
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle(R.string.hello)
+                .setMessage(R.string.instructions)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                })
+                .create().show();
+        Data.setFirstTime(false, getApplicationContext());
+    }
+
+    private void showTermsDialog() {
         new Thread() {
             @Override
             public void run() {
@@ -155,15 +166,20 @@ public class MainActivity extends Activity {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     public void run() {
                         new AlertDialog.Builder(MainActivity.this)
-                                .setTitle(R.string.hello)
-                                .setMessage(R.string.instructions)
+                                .setTitle(R.string.terms_title)
+                                .setMessage(R.string.terms)
+                                .setCancelable(false)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-
+                                        showFirstTimeDialog();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        finish();
                                     }
                                 })
                                 .create().show();
-                        Data.setFirstTime(false, getApplicationContext());
                     }
                 });
             }
