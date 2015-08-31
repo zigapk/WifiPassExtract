@@ -14,6 +14,9 @@ import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
@@ -30,6 +33,10 @@ public class MainActivity extends Activity {
 		if(Data.isFirstTime(getApplicationContext())) {
 			showFirstTimeDialog();
 		}
+
+		AdView mAdView = (AdView) findViewById(R.id.adView);
+		AdRequest adRequest = new AdRequest.Builder().build();
+		mAdView.loadAd(adRequest);
     }
 
 	private void startRefresh() {
@@ -77,7 +84,7 @@ public class MainActivity extends Activity {
                         scrollLinearLayout.addView(current.cardView);
                     }
 
-                    scrollLinearLayout.addView(marginView(128));
+                    scrollLinearLayout.addView(marginView(200));
                     progressTv.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
                     scrollView.setVisibility(View.VISIBLE);

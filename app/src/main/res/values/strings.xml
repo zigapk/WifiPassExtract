@@ -5,4 +5,5 @@
 	<string name="waiting_for_root">Waiting for root privileges ...</string>
 	<string name="hello">Hello!</string>
 	<string name="instructions">Touch the card to reveal its password.</string>
+	<string name="banner_ad_unit_id">ca-app-pub-5159809184309788/2207286954</string>
 </resources>
