@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="coffe_array">
+        <item>One cup of coffee - $1.5</item>
+        <item>Two cups of coffee - $3</item>
+        <item>Three cups of coffee - $4.5</item>
+    </string-array>
+</resources>

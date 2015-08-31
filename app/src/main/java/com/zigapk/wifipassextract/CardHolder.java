@@ -90,7 +90,7 @@ public class CardHolder {
         this.focused = focused;
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             if (focused) cardView.animate().z(25);
-            else cardView.animate().z(5);
+            else cardView.animate().z(context.getResources().getDimension(R.dimen.cardview_default_elevation));
         } else {
             if (focused) cardView.setCardBackgroundColor(Color.LTGRAY);
             else cardView.setCardBackgroundColor(Color.WHITE);
