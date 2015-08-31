@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wifi Password Extractor</string>
+	<string name="not_root">Your device does not seem to be rooted.</string>
+	<string name="waiting_for_root">Waiting for root privileges ...</string>
+	<string name="hello">Hello!</string>
+	<string name="instructions">Touch the card to reveal its password.</string>
+</resources>
