@@ -2,13 +2,14 @@ package com.zigapk.wifipassextract;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -16,7 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -25,28 +28,55 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
 
     public static ArrayList<CardHolder> cardHolders = new ArrayList<CardHolder>();
+    public static FloatingActionButton fab;
+    public static CardHolder currentCardHolder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        startRefresh();
-
-        if (Data.isFirstTime(getApplicationContext()))
-            showTermsDialog();
+        if (Data.isFirstTime(getApplicationContext())) showTermsDialog();
+        else startRefresh();
 
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        prepareFab();
+    }
+
+    private void prepareFab() {
+        fab = (FloatingActionButton) findViewById(R.id.myFab);
+        fab.setEnabled(false);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                if(currentCardHolder.network.password != null){
+                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.password);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
+                }else if(currentCardHolder.network.psk != null){
+                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.psk);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getApplicationContext(), "No password to copy.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+
+        //TODO: uncomment and add coffees
+        /*MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);*/
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -99,15 +129,19 @@ public class MainActivity extends Activity {
                                                      }
             );
 
-            for (Network network : networks) {
-                cardHolders.add(new CardHolder(network, getApplicationContext()));
+            boolean done = false;
+            for (int i = 0; i < networks.length; i++) {
+                cardHolders.add(new CardHolder(networks[i], getApplicationContext()));
+                if(i==networks.length - 1) done = true;
             }
+
+            while (!done){}
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    for (CardHolder current : cardHolders) {
-                        scrollLinearLayout.addView(current.cardView);
+                    for (int i = 0; i < cardHolders.size(); i++){
+                        scrollLinearLayout.addView(cardHolders.get(i).cardView);
                     }
 
                     scrollLinearLayout.addView(marginView(200));
@@ -126,7 +160,7 @@ public class MainActivity extends Activity {
     private void showMessage(final String str) {
         try {
             Thread.sleep(300);
-        } catch (Exception asdf) {
+        } catch (Exception e) {
         }
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             public void run() {
@@ -171,6 +205,7 @@ public class MainActivity extends Activity {
                                 .setCancelable(false)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
+                                        startRefresh();
                                         showFirstTimeDialog();
                                     }
                                 })

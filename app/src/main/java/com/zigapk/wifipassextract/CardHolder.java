@@ -18,6 +18,7 @@ public class CardHolder {
     private String hiddenText;
     private Context context;
     private boolean focused = false;
+    private float defaultElevation = 5;
 
 
     public CardHolder(Network network, Context context) {
@@ -64,7 +65,7 @@ public class CardHolder {
         result.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    setFocused(!isFocused());
+                    setFocused(!isFocused(), true);
                     if (isFocused()) unfocusAllButMe(MainActivity.cardHolders);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -73,12 +74,16 @@ public class CardHolder {
             }
         });
 
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            result.setElevation(defaultElevation);
+        }
+
         this.cardView = result;
     }
 
     private void unfocusAllButMe(ArrayList<CardHolder> list) {
         for (CardHolder current : list) {
-            if (current.cardView != cardView) current.setFocused(false);
+            if (current.cardView != cardView) current.setFocused(false, false);
         }
     }
 
@@ -86,11 +91,11 @@ public class CardHolder {
         return focused;
     }
 
-    public void setFocused(boolean focused) {
+    public void setFocused(boolean focused, boolean onCLickUnfocus) {
         this.focused = focused;
         if (android.os.Build.VERSION.SDK_INT >= 21) {
             if (focused) cardView.animate().z(25);
-            else cardView.animate().z(context.getResources().getDimension(R.dimen.cardview_default_elevation));
+            else cardView.animate().z(defaultElevation);
         } else {
             if (focused) cardView.setCardBackgroundColor(Color.LTGRAY);
             else cardView.setCardBackgroundColor(Color.WHITE);
@@ -100,12 +105,20 @@ public class CardHolder {
             if (focused) hiddenTv.setText(hiddenText);
             else hiddenTv.setText("********");
         }
+
+        if(onCLickUnfocus && !focused) MainActivity.fab.setEnabled(false);
+        else if(focused) {
+            if(network.password != null || network.psk != null) MainActivity.fab.setEnabled(true);
+            else MainActivity.fab.setEnabled(false);
+        }
+
+        MainActivity.currentCardHolder = this;
     }
 
     private TextView getTitle(String title) {
         TextView result = new TextView(context);
         TableRow.LayoutParams params = new TableRow.LayoutParams();
-        params.width = TableRow.LayoutParams.FILL_PARENT;
+        params.width = TableRow.LayoutParams.MATCH_PARENT;
         params.height = TableRow.LayoutParams.WRAP_CONTENT;
         result.setText(title);
         result.setTextSize(18);
