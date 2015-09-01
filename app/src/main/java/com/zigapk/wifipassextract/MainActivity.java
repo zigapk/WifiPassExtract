@@ -48,28 +48,6 @@ public class MainActivity extends Activity {
         prepareFab();
     }
 
-    private void prepareFab() {
-        fab = (FloatingActionButton) findViewById(R.id.myFab);
-        fab.setEnabled(false);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                if(currentCardHolder.network.password != null){
-                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.password);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
-                }else if(currentCardHolder.network.psk != null){
-                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.psk);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(getApplicationContext(), "No password to copy.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
@@ -110,11 +88,8 @@ public class MainActivity extends Activity {
 
         Files.writeToFile("wpa_supplicant.conf", "", getApplicationContext());
         try {
-            Thread.sleep(10);
             RootAccess.exec("cp /data/misc/wifi/wpa_supplicant.conf /data/data/com.zigapk.wifipassextract/files/");
-            Thread.sleep(10);
             String fileContent = Files.getFileValue("wpa_supplicant.conf", getApplicationContext());
-            Thread.sleep(10);
 
             final Network[] networks = Network.fromFile(fileContent);
 
@@ -245,5 +220,27 @@ public class MainActivity extends Activity {
         params.width = TableRow.LayoutParams.MATCH_PARENT;
         view.setLayoutParams(params);
         return view;
+    }
+
+    private void prepareFab() {
+        fab = (FloatingActionButton) findViewById(R.id.myFab);
+        fab.setEnabled(false);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                if (currentCardHolder.network.password != null) {
+                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.password);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
+                } else if (currentCardHolder.network.psk != null) {
+                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.psk);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "No password to copy.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
