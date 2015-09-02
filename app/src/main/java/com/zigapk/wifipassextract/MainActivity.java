@@ -30,6 +30,7 @@ public class MainActivity extends Activity {
     public static ArrayList<CardHolder> cardHolders = new ArrayList<CardHolder>();
     public static FloatingActionButton fab;
     public static CardHolder currentCardHolder;
+    public static int numberOfNetworks;
 
 
     @Override
@@ -93,24 +94,26 @@ public class MainActivity extends Activity {
 
             final Network[] networks = Network.fromFile(fileContent);
 
-            Thread.sleep(300);
+            while (networks.length != numberOfNetworks){}
+            cardHolders.clear();
+
+            for (int i = 0; i < networks.length; i++) {
+                cardHolders.add(new CardHolder(networks[i], getApplicationContext()));
+            }
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                                          public void run() {
-                                                             cardHolders.clear();
                                                              scrollLinearLayout.removeAllViews();
                                                              scrollLinearLayout.addView(marginView(32));
                                                          }
                                                      }
             );
 
-            boolean done = false;
-            for (int i = 0; i < networks.length; i++) {
-                cardHolders.add(new CardHolder(networks[i], getApplicationContext()));
-                if(i==networks.length - 1) done = true;
-            }
+            Thread.sleep(300);
 
-            while (!done){}
+            while (cardHolders.size() != networks.length){
+                System.out.print("asdf");
+            }
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -229,12 +232,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                if (currentCardHolder.network.password != null) {
-                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.password);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
-                } else if (currentCardHolder.network.psk != null) {
-                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.network.psk);
+                if (currentCardHolder.hiddenText != null && !currentCardHolder.hidePass) {
+                    ClipData clip = ClipData.newPlainText("Password", currentCardHolder.hiddenText);
                     clipboard.setPrimaryClip(clip);
                     Toast.makeText(getApplicationContext(), "Password copied.", Toast.LENGTH_SHORT).show();
                 } else {

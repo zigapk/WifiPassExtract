@@ -1,5 +1,8 @@
 package com.zigapk.wifipassextract;
-import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 
@@ -13,6 +16,9 @@ public class Network {
 	String anonymous_identity;
 
 	public static Network[] fromFile(String file) {
+        int count = StringUtils.countMatches(file, "network={");
+        MainActivity.numberOfNetworks = count;
+
 		if(!file.contains("network={")) return new Network[0];
 		file = file.substring(file.indexOf("network={"), file.length());
 		Character customNewLine = file.charAt(file.indexOf("{") + 1);
@@ -31,6 +37,7 @@ public class Network {
 			result.add(parseNetwork(current));
 			start = stop;
 		}
+
 		return result.toArray(new Network[result.size()]);
 	}
 

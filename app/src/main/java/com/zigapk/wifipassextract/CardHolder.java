@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -15,10 +16,11 @@ public class CardHolder {
     CardView cardView;
     Network network;
     private TextView hiddenTv;
-    private String hiddenText;
+    public String hiddenText;
     private Context context;
     private boolean focused = false;
     private float defaultElevation = 5;
+    public boolean hidePass = false; //true when hidden wifi networks occur
 
 
     public CardHolder(Network network, Context context) {
@@ -78,6 +80,8 @@ public class CardHolder {
             result.setElevation(defaultElevation);
         }
 
+        hidePass = HiddenNetworks.shouldBeHidden(this);
+
         this.cardView = result;
     }
 
@@ -101,9 +105,11 @@ public class CardHolder {
             else cardView.setCardBackgroundColor(Color.WHITE);
         }
 
-        if (hiddenText != null) {
+        if (hiddenText != null && !hidePass) {
             if (focused) hiddenTv.setText(hiddenText);
             else hiddenTv.setText("********");
+        }else if(hidePass  && focused){
+            Toast.makeText(context, "Password for this network won't be shown.", Toast.LENGTH_SHORT).show();
         }
 
         if(onCLickUnfocus && !focused) MainActivity.fab.setEnabled(false);
@@ -112,7 +118,9 @@ public class CardHolder {
             else MainActivity.fab.setEnabled(false);
         }
 
-        MainActivity.currentCardHolder = this;
+        if(focused) {
+            MainActivity.currentCardHolder = this;
+        }
     }
 
     private TextView getTitle(String title) {
